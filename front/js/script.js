@@ -15,6 +15,7 @@ function displayArticle(article) {
   </a>`;
 
   document.getElementById("items").innerHTML += blocArticle;
+  
 }
 
 function displayArticles(articles) {
