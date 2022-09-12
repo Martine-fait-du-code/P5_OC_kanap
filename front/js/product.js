@@ -8,8 +8,4 @@ const id = urlParams.get("id");
 
 fetch(`http://localhost:3000/api/products/${id}`)
   .then((products) => products.json())
-  .then((article => displayArticle(article))
-
-
-
-
+  .then((article => displayArticle(article)))
