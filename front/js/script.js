@@ -2,7 +2,7 @@
 
 fetch("http://localhost:3000/api/products")
   .then((products) => products.json())
-  .then((articles) => displayArticles(articles));
+  .then((articles) => displayArticles(articles))
 
 function displayArticle(article) {
 
