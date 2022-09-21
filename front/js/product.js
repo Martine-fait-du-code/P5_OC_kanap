@@ -8,7 +8,10 @@ const id = urlParams.get("id");
 
 fetch(`http://localhost:3000/api/products/${id}`)
   .then((products) => products.json())
-  .then((article) => displayArticle(article));
+  .then((article) => {
+    displayArticle(article);
+    addToCart(article);
+  });
 
 function displayArticle(article) {
   document.getElementById("title").innerHTML = article.name;
@@ -18,9 +21,26 @@ function displayArticle(article) {
   document.getElementById("price").innerHTML = article.price;
   document.getElementById("description").innerHTML = article.description;
 
-  const articleOption = article.colors.map(
+  const articleColor = article.colors.map(
     (color) => `<option value=${color}>${color}</option>`
   );
-  const colorSelect = `<option value="">--SVP, choisissez une couleur --</option> ${articleOption}`;
-  document.getElementById("colors").innerHTML = colorSelect;
+  const colorSettings = `<option value="">--SVP, choisissez une couleur --</option> ${articleColor}`;
+  document.getElementById("colors").innerHTML = colorSettings;
 }
+
+function addToCart(article) {
+  const button = document.getElementById("addToCart");
+  button.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const chosenColor = document.getElementById("colors").value;
+    const chosenQuantity = document.getElementById("quantity").value;
+
+    localStorage.setItem(
+      article._id,
+      `{color: "${chosenColor}", quantity:"${chosenQuantity}", name:"${article.name}"}`
+    );
+  });
+}
+
+//   
