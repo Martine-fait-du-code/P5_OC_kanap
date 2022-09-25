@@ -31,16 +31,21 @@ function displayArticle(article) {
 function addToCart(article) {
   const button = document.getElementById("addToCart");
   button.addEventListener("click", (e) => {
-    e.preventDefault();
-
     const chosenColor = document.getElementById("colors").value;
     const chosenQuantity = document.getElementById("quantity").value;
+    if (
+      chosenColor == null ||
+      chosenColor === "" ||
+      chosenQuantity == null ||
+      chosenQuantity === ""
+    ) {
+      e.preventDefault();
+    }
 
     localStorage.setItem(
       article._id,
       `{color: "${chosenColor}", quantity:"${chosenQuantity}", name:"${article.name}"}`
     );
+    window.location.href = "cart.html";
   });
 }
-
-//   
