@@ -31,16 +31,11 @@ function displayArticle(article) {
 function addToCart(article) {
   const button = document.getElementById("addToCart");
   button.addEventListener("click", (e) => {
+    e.preventDefault();
     const chosenColor = document.getElementById("colors").value;
     const chosenQuantity = document.getElementById("quantity").value;
-    if (
-      chosenColor == null ||
-      chosenColor === "" ||
-      chosenQuantity == null ||
-      chosenQuantity === ""
-    ) {
-      e.preventDefault();
-    }
+    if (chosenColor == null || chosenColor === "" || chosenQuantity <= 0)
+      return;
 
     localStorage.setItem(
       article._id,
