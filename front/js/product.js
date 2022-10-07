@@ -37,10 +37,14 @@ function addToCart(article) {
     if (chosenColor == null || chosenColor === "" || chosenQuantity <= 0)
       return;
 
-    localStorage.setItem(
-      article._id,
-      `{color: "${chosenColor}", quantity:"${chosenQuantity}", name:"${article.name}"}`
-    );
+    const articlesInCart = {
+      color: chosenColor,
+      quantity: chosenQuantity,
+      name: article.name
+    };
+
+    localStorage.setItem(article._id, JSON.stringify(articlesInCart));
+
     window.location.href = "cart.html";
   });
 }
