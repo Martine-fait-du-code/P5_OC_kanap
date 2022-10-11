@@ -4,7 +4,7 @@ const getArticleId = window.location.search;
 const urlParams = new URLSearchParams(getArticleId);
 const id = urlParams.get("id");
 
-// affichage de l'article séléctionné par l'id
+// On récupère l'id de chaque article
 
 fetch(`http://localhost:3000/api/products/${id}`)
   .then((products) => products.json())
@@ -40,7 +40,8 @@ function addToCart(article) {
     const articlesInCart = {
       color: chosenColor,
       quantity: chosenQuantity,
-      name: article.name
+      name: article.name,
+      price: article.price
     };
 
     localStorage.setItem(article._id, JSON.stringify(articlesInCart));

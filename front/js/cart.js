@@ -1,39 +1,38 @@
-// console.log("produits ajoutés:", itemsInCart);
-const cartContent = [];
+window.addEventListener("load", (e) => {
+  refreshCart();
+});
 
-// function getItemsInCart() {
-const itemsInCart = localStorage.length;
+function refreshCart() {
+  //const cartContent = [];
+  const itemsInCart = localStorage.length;
 
-for (let i = 0; i < itemsInCart; i++) {
-  let itemId = localStorage.key(i);
+  for (let i = 0; i < itemsInCart; i++) {
+    let itemId = localStorage.key(i);
 
-  fetch(`http://localhost:3000/api/products/${itemId}`)
-    .then((products) => products.json())
-    .then((itemApi) => {
-      // console.log(itemApi);
+    fetch(`http://localhost:3000/api/products/${itemId}`)
+      .then((products) => products.json())
+      .then((itemApi) => {
+        const items = localStorage.getItem(itemId);
 
-      const items = localStorage.getItem(itemId);
+        const kanap = {
+          id: itemId,
+          price: itemApi.price,
+          image: itemApi.imageUrl,
+          altTxt: itemApi.altTxt,
+        };
 
-      const kanap = {
-        id: itemId,
-        price: itemApi.price,
-        image: itemApi.imageUrl,
-        altTxt: itemApi.altTxt,
-      };
+        const itemObject = JSON.parse(items);
 
-      const itemObject = JSON.parse(items);
-      // clonage de kanaps
-      const itemsInCart = {
-        ...itemObject,
-        ...kanap,
-      };
+        const articlesInCart = {
+          ...itemObject,
+          ...kanap,
+        };
 
-      console.log("produit complet", itemsInCart);
-
-      cartContent.push(itemObject);
-
-      displayItems(itemsInCart);
-    });
+        //cartContent.push(itemObject);
+        displayItems(articlesInCart);
+      });
+    displayTotalCart();
+  }
 }
 
 function displayItems(item) {
@@ -45,19 +44,55 @@ function displayItems(item) {
                   <div class="cart__item__content__description">
                     <h2>${item.name}</h2>
                     
-                    <p>${item.price}</p>
+                    <p>${item.price} €</p>
                   </div>
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="">
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${item.quantity}>
                     </div>
-                    <div class="cart__item__content__settings__delete">
-                      <p class="deleteItem">Supprimer</p>
+                    <div id="divDelete_${item.id}" class="cart__item__content__settings__delete">
+          
                     </div>
                   </div>
                 </div>
               </article>`;
-
   document.getElementById("cart__items").innerHTML += nodeArticle;
+
+  const monP = document.createElement("p");
+  monP.id = "sup_" + item.id;
+  monP.innerText = "Supprimer";
+  monP.className = "deleteItem";
+  monP.addEventListener(
+    "click",
+    function () {
+      itemDeleted(item.id);
+    },
+    false
+  );
+  document.getElementById("divDelete_" + item.id).appendChild(monP);
+}
+
+function displayTotalCart() {
+  let totalQuantity = 0;
+  let totalPrice = 0;
+  Object.keys(localStorage).forEach(function (key) {
+    const items = localStorage.getItem(key);
+    const itemObject = JSON.parse(items);
+    totalQuantity += parseInt(itemObject.quantity);
+    totalPrice += itemObject.price * itemObject.quantity;
+  });
+
+  document.getElementById("totalQuantity").innerHTML = totalQuantity;
+  document.getElementById("totalPrice").innerHTML = totalPrice;
+}
+
+function itemDeleted(itemId) {
+  if (confirm("Are you sure you want to delete?")) {
+    localStorage.removeItem(itemId);
+    document.getElementById("cart__items").innerHTML = "";
+    document.getElementById("totalQuantity").innerHTML = "";
+    document.getElementById("totalPrice").innerHTML = "";
+    refreshCart();
+  }
 }
