@@ -3,7 +3,7 @@ window.addEventListener("load", (e) => {
 });
 
 function refreshCart() {
-  //const cartContent = [];
+  //  const cartContent = [];
   const itemsInCart = localStorage.length;
 
   for (let i = 0; i < itemsInCart; i++) {
@@ -26,9 +26,8 @@ function refreshCart() {
         const articlesInCart = {
           ...itemObject,
           ...kanap,
-        };
+        }; //  cartContent.push(itemObject);
 
-        //cartContent.push(itemObject);
         displayItems(articlesInCart);
       });
     displayTotalCart();
@@ -36,42 +35,34 @@ function refreshCart() {
 }
 
 function displayItems(item) {
-  const nodeArticle = `<article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
-                <div class="cart__item__img">
-                  <img src=${item.image} alt=${item.altTxt}>
-                </div>
-                <div class="cart__item__content">
-                  <div class="cart__item__content__description">
+  const nodeArticle = `<article class="cart__item" data-id="${item.id}" data-color="${item.color}">
+                      <div class="cart__item__img">
+                    <img src=${item.image} alt=${item.altTxt}>
+                      </div>
+                    <div class="cart__item__content">
+                    <div class="cart__item__content__description">
                     <h2>${item.name}</h2>
-                    
+                    <p>${item.color}</p>
                     <p>${item.price} €</p>
-                  </div>
-                  <div class="cart__item__content__settings">
+                    </div>
+                    <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
-                      <p>Qté : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${item.quantity}>
-                    </div>
-                    <div id="divDelete_${item.id}" class="cart__item__content__settings__delete">
-          
-                    </div>
+                    <p>Qté : </p>
+                  <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${item.quantity}>
                   </div>
-                </div>
-              </article>`;
-  document.getElementById("cart__items").innerHTML += nodeArticle;
+                <div class="cart__item__content__settings__delete">
+              <div class="cart__item__content__settings__delete">
+              <p id=${item.id}class="deleteItem">Supprimer</p>
+            </div>
+            </div>
+            </div>
+            </div>
+              </div>
+                </article>`;
 
-  const monP = document.createElement("p");
-  monP.id = "sup_" + item.id;
-  monP.innerText = "Supprimer";
-  monP.className = "deleteItem";
-  monP.addEventListener(
-    "click",
-    function () {
-      itemDeleted(item.id);
-    },
-    false
-  );
-  document.getElementById("divDelete_" + item.id).appendChild(monP);
+  document.getElementById("cart__items").innerHTML += nodeArticle;
 }
+  
 
 function displayTotalCart() {
   let totalQuantity = 0;
@@ -87,12 +78,31 @@ function displayTotalCart() {
   document.getElementById("totalPrice").innerHTML = totalPrice;
 }
 
-function itemDeleted(itemId) {
-  if (confirm("Are you sure you want to delete?")) {
-    localStorage.removeItem(itemId);
+function itemDeleted(item) {
+  // alert(item.id);
+  if (confirm("Supprimer cet article?")) {
+    localStorage.removeItem(item.id);
     document.getElementById("cart__items").innerHTML = "";
     document.getElementById("totalQuantity").innerHTML = "";
     document.getElementById("totalPrice").innerHTML = "";
     refreshCart();
   }
+}
+
+function deleteBtns(buttons){
+document.querySelectorAll(".deleteItem")
+buttons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    alert(btn.closest("article").getAttribute("data-id"));
+    itemDeleted(btn.closest("article").getAttribute("data-id"));
+  });
+});
+}
+
+document
+  .querySelector(".itemQuantity")
+  .addEventListener("input", () => updateTotalCart(item.id, input.value));
+function updateTotalCart(id, newValue) {
+  const totalUpdated = localStorage.length.find((item) => item.id === id);
+  totalUpdated.quantity = newValue;
 }

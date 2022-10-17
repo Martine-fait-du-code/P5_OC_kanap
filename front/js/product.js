@@ -35,7 +35,11 @@ function addToCart(article) {
     const chosenColor = document.getElementById("colors").value;
     const chosenQuantity = document.getElementById("quantity").value;
     if (chosenColor == null || chosenColor === "" || chosenQuantity <= 0)
-      return;
+    return + alert("SVP renseignez la couleur et la quantité");
+    if (chosenQuantity > 0 && chosenColor != null);
+    button.innerText = ("Produit ajouté!")
+      
+      
 
     const articlesInCart = {
       color: chosenColor,
