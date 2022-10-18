@@ -50,29 +50,43 @@ function getTotalPrice() {
 }
 
 function getOneProductDataFromApi(product) {
-  fetch(`http://localhost:3000/api/products/${product.id}`)
-    .then((products) => products.json())
-    .then((itemApi) => {
-      const kanap = {
-        id: product.id,
-        price: itemApi.price,
-        image: itemApi.imageUrl,
-        altTxt: itemApi.altTxt,
-      };
-      const data = {
-        ...product,
-        ...kanap,
-      };
+  let obj = fetch(`http://localhost:3000/api/products/${product.id}`);
+  let jsonStr = obj.then((products) => products.json());
+  let itemApi = jsonStr.then((data) => ({ data: data }));
 
-      displayItems(data);
-    });
+  const kanap = {
+    id: product.id,
+    price: itemApi.price,
+    image: itemApi.imageUrl,
+    altTxt: itemApi.altTxt
+  };
+
+  return {
+    ...product,
+    ...kanap,
+  };
+  // fetch(`http://localhost:3000/api/products/${product.id}`)
+  //   .then((products) => products.json())
+  //   .then((itemApi) => {
+  //     const kanap = {
+  //       id: product.id,
+  //       price: itemApi.price,
+  //       image: itemApi.imageUrl,
+  //       altTxt: itemApi.altTxt,
+  //     };
+  //     const data = {
+  //       ...product,
+  //       ...kanap,
+  //     };
 }
 
 function getAllCartData() {
+  const cartContent = [];
   let cartFromStorage = getCart();
   cartFromStorage.forEach((item) => {
-    getOneProductDataFromApi(item);
+    cartContent.push(getOneProductDataFromApi(item));
   });
+  return cartContent;
 }
 
 /*
@@ -86,7 +100,12 @@ window.addEventListener("load", (e) => {
 
 function refreshCartView() {
   resetCartView();
-  getAllCartData();
+  // getAllCartData();
+  const cartContent = getAllCartData();
+  cartContent.forEach((item) => {
+    displayItems(item);
+  });
+  addEvents();
 
   document.getElementById("totalQuantity").innerHTML = getTotalProduct();
   document.getElementById("totalPrice").innerHTML = getTotalPrice();
@@ -119,30 +138,42 @@ function displayItems(item) {
               </article>`;
   document.getElementById("cart__items").innerHTML += nodeArticle;
 
- 
+  // let btn = document.getElementById("btn_" + item.id);
+  // btn.addEventListener("click", () => {
+  //   itemDeleted(btn.closest("article").getAttribute("data-id"));
+  // });
 
-  let btn = document.getElementById("btn_" + item.id);
-  btn.addEventListener("click", () => {
-    itemDeleted(btn.closest("article").getAttribute("data-id"));
-  });
-
-  let qty = document.getElementById("qty_" + item.id);
-  qty.addEventListener("change", () => {
-    updateTotalCart(qty.closest("article").getAttribute("data-id"), qty.value);
-  });
+  // let qty = document.getElementById("qty_" + item.id);
+  // qty.addEventListener("change", () => {
+  //   updateTotalCart(qty.closest("article").getAttribute("data-id"), qty.value);
+  // });
 }
 
 function addEvents() {
   //delete button
+  // const btn = document.getElementById(`btn_"${item.id + item.color}"`);
+  // btn.addEventListener("click", () => {
+  //   itemDeleted(btn.closest("article").getAttribute("data-id"));
+  // });
+
+  // const article = document.getElementById(`article_"${item.id + item.color}"`);
+  // btn.addEventListener("click", () => {
+  //   itemDeleted(article.getAttribute("data-id"));
+  // });
+
   const buttons = document.querySelectorAll(".deleteItem");
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       itemDeleted(btn.closest("article").getAttribute("data-id"));
     });
   });
-  
 
   //Quantity field
+  // const qtyFields = document.getElementById(`qty_"${item.id + item.color}"`);
+  // qty.addEventListener("change", () => {
+  //   itemDeleted(qtyFields.getAttribute("data-id"));
+  // });
+
   const QtyFields = document.querySelectorAll(".itemQuantity");
   QtyFields.forEach((field) => {
     field.addEventListener("change", () => {

@@ -48,7 +48,7 @@ function addToCart(article) {
       price: article.price,
     };
 
-    addProductToCart(articlesInCart, key);
+    addProductToCart(articlesInCart);
 
     window.location.href = "cart.html";
   });
