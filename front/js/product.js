@@ -35,21 +35,46 @@ function addToCart(article) {
     const chosenColor = document.getElementById("colors").value;
     const chosenQuantity = document.getElementById("quantity").value;
     if (chosenColor == null || chosenColor === "" || chosenQuantity <= 0)
-    return + alert("SVP renseignez la couleur et la quantité");
+      return +alert("SVP renseignez la couleur et la quantité");
     if (chosenQuantity > 0 && chosenColor != null);
-    button.innerText = ("Produit ajouté!")
-      
-      
+    button.innerText = "Produit ajouté!";
 
+    
     const articlesInCart = {
+      id: article._id,
       color: chosenColor,
       quantity: chosenQuantity,
       name: article.name,
-      price: article.price
+      price: article.price,
     };
 
-    localStorage.setItem(article._id, JSON.stringify(articlesInCart));
+    addProductToCart(articlesInCart, key);
 
     window.location.href = "cart.html";
   });
+}
+
+function getCart() {
+  let cart = localStorage.getItem("cart");
+
+  if (cart == null) {
+    return [];
+  } else {
+    return JSON.parse(cart);
+  }
+}
+
+function addProductToCart(product) {
+  let cart = getCart();
+  let productFound = cart.find((p) => p.id == product.id);
+  if (productFound != undefined) {
+    productFound.quantity++;
+  } else {
+    cart.push(product);
+  }
+  saveCart(cart);
+}
+
+function saveCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
 }
