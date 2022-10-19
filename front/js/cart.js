@@ -14,16 +14,16 @@ function getCart() {
 
 function removeFromCart(productId) {
   let cart = getCart();
-  cart = cart.filter((p) => p.id != productId);
+  cart = cart.filter((p) => p.id_color != productId);
   saveCart(cart);
 }
 
 function changeQuantity(productId, quantity) {
   let cart = getCart();
-  let productFound = cart.find((p) => p.id == productId);
+  let productFound = cart.find((p) => p.id_color == productId);
   if (productFound != undefined) {
     productFound.quantity = quantity;
-    if (productFound <= 0) {
+    if (quantity <= 0) {
       removeFromCart(productId);
     } else {
       saveCart(cart);
@@ -49,44 +49,34 @@ function getTotalPrice() {
   return total;
 }
 
-function getOneProductDataFromApi(product) {
-  let obj = fetch(`http://localhost:3000/api/products/${product.id}`);
-  let jsonStr = obj.then((products) => products.json());
-  let itemApi = jsonStr.then((data) => ({ data: data }));
+async function getOneProductDataFromApi(product) {
+  let itemApi = await fetch(`http://localhost:3000/api/products/${product.id}`)
+    .then((products) => products.json())
+    .then((article) => {
+      return article;
+    });
+  product.id.split("_")[0];
 
   const kanap = {
-    id: product.id,
     price: itemApi.price,
     image: itemApi.imageUrl,
-    altTxt: itemApi.altTxt
+    altTxt: itemApi.altTxt,
   };
 
-  return {
+  const elem = {
     ...product,
     ...kanap,
   };
-  // fetch(`http://localhost:3000/api/products/${product.id}`)
-  //   .then((products) => products.json())
-  //   .then((itemApi) => {
-  //     const kanap = {
-  //       id: product.id,
-  //       price: itemApi.price,
-  //       image: itemApi.imageUrl,
-  //       altTxt: itemApi.altTxt,
-  //     };
-  //     const data = {
-  //       ...product,
-  //       ...kanap,
-  //     };
+
+  displayItems(elem);
+  addEvents();
 }
 
 function getAllCartData() {
-  const cartContent = [];
   let cartFromStorage = getCart();
   cartFromStorage.forEach((item) => {
-    cartContent.push(getOneProductDataFromApi(item));
+    getOneProductDataFromApi(item);
   });
-  return cartContent;
 }
 
 /*
@@ -100,19 +90,15 @@ window.addEventListener("load", (e) => {
 
 function refreshCartView() {
   resetCartView();
-  // getAllCartData();
-  const cartContent = getAllCartData();
-  cartContent.forEach((item) => {
-    displayItems(item);
-  });
-  addEvents();
-
+  getAllCartData();
   document.getElementById("totalQuantity").innerHTML = getTotalProduct();
   document.getElementById("totalPrice").innerHTML = getTotalPrice();
 }
 
 function displayItems(item) {
-  const nodeArticle = `<article class="cart__item" data-id="${item.id}" data-color="${item.color}">
+  const nodeArticle = `<article class="cart__item" data-id="${
+    item.id + item.color
+  }" data-color="${item.color}">
                 <div class="cart__item__img">
                   <img src=${item.image} alt=${item.altTxt}>
                 </div>
@@ -125,11 +111,17 @@ function displayItems(item) {
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input id="qty_${item.id}" data-id=${item.id} type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${item.quantity}>
+                      <input id="qty_${item.id + item.color}" data-id=${
+    item.id + item.color
+  } type="number" class="itemQuantity" name="itemQuantity" min="0" max="100" value=${
+    item.quantity
+  }>
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <div class="cart__item__content__settings__delete">
-                      <p id="btn_${item.id}" data-id=${item.id} class="deleteItem">Supprimer</p>
+                      <p id="btn_${item.id + item.color}}" data-id=${
+    item.id + item.color
+  } class="deleteItem">Supprimer</p>
                     </div>
                   </div>
                     </div>
@@ -151,28 +143,12 @@ function displayItems(item) {
 
 function addEvents() {
   //delete button
-  // const btn = document.getElementById(`btn_"${item.id + item.color}"`);
-  // btn.addEventListener("click", () => {
-  //   itemDeleted(btn.closest("article").getAttribute("data-id"));
-  // });
-
-  // const article = document.getElementById(`article_"${item.id + item.color}"`);
-  // btn.addEventListener("click", () => {
-  //   itemDeleted(article.getAttribute("data-id"));
-  // });
-
   const buttons = document.querySelectorAll(".deleteItem");
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       itemDeleted(btn.closest("article").getAttribute("data-id"));
     });
   });
-
-  //Quantity field
-  // const qtyFields = document.getElementById(`qty_"${item.id + item.color}"`);
-  // qty.addEventListener("change", () => {
-  //   itemDeleted(qtyFields.getAttribute("data-id"));
-  // });
 
   const QtyFields = document.querySelectorAll(".itemQuantity");
   QtyFields.forEach((field) => {

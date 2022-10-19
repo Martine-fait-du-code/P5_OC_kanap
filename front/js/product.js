@@ -39,9 +39,9 @@ function addToCart(article) {
     if (chosenQuantity > 0 && chosenColor != null);
     button.innerText = "Produit ajouté!";
 
-    
     const articlesInCart = {
       id: article._id,
+      id_color: article._id + chosenColor,
       color: chosenColor,
       quantity: chosenQuantity,
       name: article.name,
@@ -66,7 +66,7 @@ function getCart() {
 
 function addProductToCart(product) {
   let cart = getCart();
-  let productFound = cart.find((p) => p.id == product.id);
+  let productFound = cart.find((p) => p.id_color == product.id_color);
   if (productFound != undefined) {
     productFound.quantity++;
   } else {
