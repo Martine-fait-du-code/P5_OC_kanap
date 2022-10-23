@@ -85,7 +85,7 @@ function getAllCartData() {
 
 window.addEventListener("load", (e) => {
   refreshCartView();
-  //addEvents();
+  // addEvents();
 });
 
 function refreshCartView() {
@@ -178,3 +178,65 @@ function resetCartView() {
   document.getElementById("totalQuantity").innerHTML = "";
   document.getElementById("totalPrice").innerHTML = "";
 }
+
+// --------------ORDER--------------------
+
+const orderBtn = document.querySelector("#order");
+orderBtn.addEventListener("click", (e) => submitForm(e));
+
+function submitForm(e) {
+  e.preventDefault();
+  let cart = getCart();
+  if (cart.length === 0) {
+    alert("Votre panier est vide!")
+    return
+  }
+
+
+  const body = getFormValues();
+  fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log(data));
+    
+}
+
+function getFormValues() {
+  const cartForm = document.querySelector(".cart__order__form");
+  const firstName = cartForm.elements.firstName.value;
+  const lastName = cartForm.elements.lastName.value;
+  const address = cartForm.elements.address.value;
+  const city = cartForm.elements.city.value;
+  const email = cartForm.elements.email.value;
+  
+
+  const bodyForm = {
+    contact: {
+      firstName: firstName,
+      lastName: lastName,
+      address: address,
+      city: city,
+      email: email,
+    },
+    products: getIdsInCart(),
+  };
+  return bodyForm;
+}
+
+function getIdsInCart() {
+  let idTab = [];
+  const cart = getCart();
+  cart.forEach((item) => {
+    if (!idTab.includes(item.id)) idTab.push(item.id);
+  });
+  return idTab;
+}
+
+// function formValidation() {
+  
+// }
