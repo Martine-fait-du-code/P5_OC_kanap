@@ -1,9 +1,19 @@
-function getOrderId() {
+const getOrder = getOrderId();
+displayOrderId(getOrderId());
+clearLocalStorage();
 
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-return urlParams.get("orderId");
+function getOrderId() {
+  const confirmationPage = window.location.search;
+  const urlParams = new URLSearchParams(confirmationPage);
+  return urlParams.get("orderId");
 }
 
- const getOrder = getOrderId() 
-console.log(orderId)
+function displayOrderId(orderId) {
+  const spanOderId = document.querySelector("#orderId");
+  spanOderId.innerText = orderId;
+}
+
+function clearLocalStorage() {
+    const localStorage = window.localStorage;
+    localStorage.clear()
+}

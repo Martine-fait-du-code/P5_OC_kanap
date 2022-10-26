@@ -300,8 +300,8 @@ function submitForm(e) {
       .then((res) => res.json())
       .then((data) =>{
         const orderId = data.orderId;
-        window.location.href = "./html/confirmation.hmtl" + "?orderId=" +orderId;
-        return console.log(data);
+        window.location.href =
+          "confirmation.html" + "?orderId=" + orderId;
       }
       );
 
