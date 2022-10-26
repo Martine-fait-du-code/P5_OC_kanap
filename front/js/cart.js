@@ -181,29 +181,140 @@ function resetCartView() {
 
 // --------------ORDER--------------------
 
-const orderBtn = document.querySelector("#order");
-orderBtn.addEventListener("click", (e) => submitForm(e));
+window.addEventListener("load", (event) => {
+  orderValidation();
+});
+// on définit les différents types de champs
+const dataType = {
+  text: 0,
+  email: 1,
+}
+
+function checkTextField(valueString) {
+  if (valueString === "") {
+    return [false, "Veuillez remplir ce champ SVP"]; //retourne 2 valeurs : true/false si ok/ko et le message à afficher
+  } else if (!valueString.match(/^[a-zA-Z]*$/)) {
+    return [false, "Ce champ ne doit contenir que des lettres"];
+  } else {
+    let numberOfLetters = valueString.length;
+    if (numberOfLetters < 3) {
+      return [false, "Ce champ doit contenir au moins 3 lettres"];
+    } else {
+      return [true, ""];
+    }
+  }
+}
+// on vérifie le champ email
+function checkEmailField(emailString) {
+  const emailRegex = new RegExp(
+    /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/,
+    "gm"
+  );
+  if (emailRegex.test(emailString)) {
+    //test spécifique email
+    return [true, ""];
+  } else {
+    return [false, "adresse email invalide"];
+  }
+}
+
+function validateInputValue(inputObject) {
+  if (inputObject == null) return;
+
+  // du coup on traite selon le type:
+  let result = null;
+
+  switch (inputObject.type) {
+    case "text":
+      result = checkTextField(inputObject.value.trim());
+      break;
+    case "email":
+      result = checkEmailField(inputObject.value.trim());
+      break;
+  }
+
+  if (result == null) return false;
+
+  if (result[0] == false) {
+    error(inputObject, result[1]);
+    return false;
+  } else if (result[0] == true) {
+    success(inputObject);
+    return true;
+  }
+}
+
+function checkForm() {
+  if (!validateInputValue(document.getElementById("firstName"))) return false; 
+  if (!validateInputValue(document.getElementById("lastName"))) return false;
+  if (!validateInputValue(document.getElementById("address"))) return false;
+  if (!validateInputValue(document.getElementById("city"))) return false;
+  if (!validateInputValue(document.getElementById("email"))) return false;
+
+  return true;
+}
+
+function orderValidation() {
+  const orderBtn = document.querySelector("#order");
+  orderBtn.addEventListener("click", (e) => {
+    return submitForm(e);
+  }); //submitForm(e) doit retourner true ou false. si false : n'envoie pas le formulaire
+
+  const fieldsToControl = []; //array qui contiendra les objets 'input'
+
+  // permet d'ajouter l'event  sur les champs voulus
+  fieldsToControl.push(document.querySelector("#firstName"));
+  fieldsToControl.push(document.querySelector("#lastName"));
+  fieldsToControl.push(document.querySelector("#address"));
+  fieldsToControl.push(document.querySelector("#city"));
+  fieldsToControl.push(document.querySelector("#email"));
+
+  //pour chaque objet : ajout de l'evènemet
+  fieldsToControl.forEach((field) => {
+    // console.log(field)
+    field.addEventListener("focusout", (e) => {
+      //focusout : lancé quand on sort du champ.
+      e.preventDefault();
+      checkForm();
+    });
+  });
+}
 
 function submitForm(e) {
   e.preventDefault();
   let cart = getCart();
   if (cart.length === 0) {
-    alert("Votre panier est vide!")
-    return
+        alert("Votre panier est vide!");
+        return;
   }
+  if (checkForm()) {
+    //==========> ne valide pas si check form trouve une anomalie
+    const body = getFormValues();
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
 
+    return true;
+  }
+  return false;
+}
 
-  const body = getFormValues();
-  fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
-    .then((res) => res.json())
-    .then((data) => console.log(data));
-    
+function error(element, errorMsg) {
+  const formControl = element.parentElement;
+  const message = formControl.querySelector("p");
+  message.innerText = errorMsg;
+}
+
+function success(element) {
+  const formControl = element.parentElement;
+  const message = formControl.querySelector("p");
+  message.innerText = "";
 }
 
 function getFormValues() {
@@ -213,7 +324,6 @@ function getFormValues() {
   const address = cartForm.elements.address.value;
   const city = cartForm.elements.city.value;
   const email = cartForm.elements.email.value;
-  
 
   const bodyForm = {
     contact: {
@@ -236,7 +346,3 @@ function getIdsInCart() {
   });
   return idTab;
 }
-
-// function formValidation() {
-  
-// }
