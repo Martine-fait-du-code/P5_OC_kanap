@@ -298,7 +298,12 @@ function submitForm(e) {
       body: JSON.stringify(body),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) =>{
+        const orderId = data.orderId;
+        window.location.href = "./html/confirmation.hmtl" + "?orderId=" +orderId;
+        return console.log(data);
+      }
+      );
 
     return true;
   }
